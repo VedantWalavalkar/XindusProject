@@ -14,6 +14,7 @@ public class UserTransformer {
                 .email(addUserRequest.getEmailId())
                 .mobile(addUserRequest.getMobileNumber())
                 .name(addUserRequest.getName())
+//                .password(addUserRequest.getPassword())
                 .password(passwordEncoder.encode(addUserRequest.getPassword()))
                 .roles(addUserRequest.getRoles())
                 .build();

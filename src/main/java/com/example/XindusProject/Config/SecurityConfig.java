@@ -25,7 +25,7 @@ public class SecurityConfig {
     public SecurityFilterChain getFilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/public/**", "/product/**")
+                .requestMatchers("/public/**", "/product/**","/swagger-ui/**")
                 .permitAll()
                 .requestMatchers("/user/**")
                 .hasRole("USER")
