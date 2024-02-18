@@ -60,16 +60,20 @@ public class UserService {
     }
 
     public void addToWishlist(int prodId, int userId) {
+        // FINDING PRODUCT AND USER WITH THE GIVEN ID.
         Optional<Product> optionalProduct = productRepository.findById(prodId);
         Optional<User> optionalUser = userRepository.findById(userId);
 
         User user = optionalUser.get();
         Product product = optionalProduct.get();
 
+        // THESE CONDITIONS WILL VERIFY IF THE PRODUCT AND USER WITH RESPECTIVE ID, EXISTS IN DATABASE.
         if(product == null) throw new RuntimeException("Product does not exist");
         if(user == null) throw new RuntimeException("User does not exist");
 
         Wishlist wishlist = user.getWishlist();
+        // AS ORM IS USED TO CREATE A SEPERATE FILE FOR PRODUCT AND WISHLIST.
+        // SETTING THE VALUE OF BOTH THE OBJECTS.
         List<Product> products = wishlist.getProducts();
         products.add(product);
 
@@ -81,39 +85,52 @@ public class UserService {
         user.setWishlist(wishlist);
         product.setWishlist(wishlists);
 
+        // SAVING USER WILL SAVE THE CURRENT USER AND THE WISHLIST OF THE USER, AS THE WISHLIST IS MAPPED BY USER.
         User savedUser = userRepository.save(user);
+        // PRODUCT NEEDS TO BE SAVED SEPERATELY.
+        // AS WISHLIST IS MAPPED BY BOTH THE OBJECTS, IT WILL BE SAVED.
         Product savedProduct = productRepository.save(product);
     }
 
     public void removeFromWishlist(int prodId, int userId) {
+        // TO REMOVE FROM WISHLIST, FIRST PRODUCT AND USER IS TO BE VERIFIED.
         Optional<Product> optionalProduct = productRepository.findById(prodId);
         Optional<User> optionalUser = userRepository.findById(userId);
 
         User user = optionalUser.get();
         Product product = optionalProduct.get();
 
+        // VERIFICATION IS DONE HERE.
         if(product == null) throw new RuntimeException("Product does not exist");
         if(user == null) throw new RuntimeException("User does not exist");
 
-
+        // EXTRACTING WISHLIST FROM THE USER.
         Wishlist wishlist = user.getWishlist();
         List<Product> productList = wishlist.getProducts();
+
         for(int i = 0; i<productList.size() ; i++){
+            // ITERATING OVER THE PRODUCT LIST AND CHECKING IF THE PRODUCT EXISTS IN THE WISHLIST.
             if(productList.get(i) != product) continue;
+            // IF FOUND PRESENT, THEN REMOVING IT FROM THE LIST.
             productList.remove(i);
             break;
         }
+        // SETTING THE UPDATED LIST.
         wishlist.setProducts(productList);
 
-
+        // DOING THE SAME FOR THE LIST OF WISHLIST IN THE PRODUCT, AS THE PRODUCT CAN BE PRESENT IN MULTIPLE WISHLISTS.
         List<Wishlist> wishlistList = product.getWishlist();
         for(int i = 0; i< wishlistList.size() ; i++){
+            // ITERATING OVER THE LIST.
             if(wishlistList.get(i) != wishlist) continue;
+            // IF FOUND PRESENT, REMOVING IT.
             wishlistList.remove(i);
             break;
         }
+        // UPDATING THE NEW LIST.
         product.setWishlist(wishlistList);
 
+        // AGAIN SAVING ONLY PRODUCT AND USER, AS IT WILL ALSO SAVE THE WISHLIST.
         Product savedProduct = productRepository.save(product);
         User savedUser = userRepository.save(user);
     }
